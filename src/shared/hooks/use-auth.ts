@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
@@ -8,6 +8,7 @@ import { UserMetadata } from '@supabase/supabase-js'
 export default function useAuth() {
   const supabase = createClient()
   const [user, setUser] = useState<User | null>(null)
+  const [token, setToken] = useState<string | null>(null)
 
   const formatUser = (rawUser: UserMetadata): User | null => {
     if (!rawUser) return null
@@ -15,36 +16,45 @@ export default function useAuth() {
     return {
       id: rawUser.id,
       email: rawUser.email,
-      username: rawUser.user_metadata?.preferred_username || rawUser.user_metadata?.user_name,
-      fullName: rawUser.user_metadata?.full_name,
-      avatarUrl: rawUser.user_metadata?.avatar_url,
-      provider: rawUser.app_metadata?.provider,
+      username:
+        rawUser.user_metadata?.preferred_username ||
+        rawUser.user_metadata?.user_name ||
+        null,
+      fullName: rawUser.user_metadata?.full_name || null,
+      avatarUrl: rawUser.user_metadata?.avatar_url || null,
+      provider: rawUser.app_metadata?.provider || null,
       createdAt: rawUser.created_at,
       lastSignInAt: rawUser.last_sign_in_at,
-      emailVerified: rawUser.user_metadata?.email_verified,
+      emailVerified: rawUser.user_metadata?.email_verified || false,
     }
   }
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser()
+      try {
+        const { data: userData, error: userError } = await supabase.auth.getUser()
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
 
-      if (error) {
-        console.error("Error fetching user:", error)
-        return
+        if (userError || sessionError) {
+          console.error('Auth error:', userError || sessionError)
+          return
+        }
+
+        if (!userData?.user) {
+          setUser(null)
+          setToken(null)
+          return
+        }
+
+        setUser(formatUser(userData.user))
+        setToken(sessionData.session?.provider_token || null)
+      } catch (err) {
+        console.error('Unexpected auth error:', err)
       }
-
-      if (!data?.user) {
-        console.log("No user found")
-        setUser(null)
-        return
-      }
-
-      setUser(formatUser(data.user))
     }
 
     fetchUser()
   }, [supabase])
 
-  return { user }
+  return { user, token }
 }
