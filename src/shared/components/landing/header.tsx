@@ -10,13 +10,7 @@ export default function Header() {
           <span className="text-xl font-bold">Loop</span>
         </Link>
         <nav className="flex items-baseline gap-4">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="#">Features</Link>
-          </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="#">Pricing</Link>
-          </Button>
-          <AuthButton/>
+          <AuthButton defaultMessage=""/>
         </nav>
       </div>
     </header>

@@ -1,6 +1,4 @@
 import Image from "next/image"
-import { Button } from "@/shared/components/shadcn/button"
-import { ArrowRight } from "lucide-react"
 import AuthButton from "../auth/auth-button"
 
 export default function Hero() {
@@ -19,10 +17,8 @@ export default function Hero() {
 
           </div>
           <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
-            <AuthButton defaultMessage={"Get Started"} />
-            <Button variant="outline" size="lg" className="px-8">
-              Learn More
-            </Button>
+            <AuthButton defaultMessage={"Get Started"}/>
+            
           </div>
         </div>
 

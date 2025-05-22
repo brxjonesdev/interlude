@@ -11,6 +11,8 @@ import useGithub from '@/utils/github/use-github';
 import { Button } from '@/shared/components/shadcn/button';
 import { Separator } from '@/shared/components/shadcn/separator';
 import useLoops from '../hooks/useLoops';
+import useAuth from '@/shared/hooks/use-auth';
+import { createNewLoop } from '../types';
 
 type CreationModalProps = {
   isOpen: boolean;
@@ -22,8 +24,8 @@ export default function CreationModal({
     onOpenChange,
 }: CreationModalProps) {
     const {eligibleRepos, status} = useGithub()
-    const { createNewLoop } = useLoops()
-    console.log(eligibleRepos)
+    const { addLoop } = useLoops()
+    const { user } = useAuth()
 
     if (status.loading) {
         return (
@@ -55,9 +57,12 @@ export default function CreationModal({
             </Dialog>
         )
     }
-    
+  if (!user) {
+    return null;
+  }
+
   return (
-<Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="font-manrope">
         <DialogHeader className="text-left">
           <DialogTitle className="text-2xl tracking-wide">Create a new loop</DialogTitle>
@@ -70,7 +75,7 @@ export default function CreationModal({
           {eligibleRepos.map((repo) => (
             <div
               key={repo.id}
-              className="flex  p-4 rounded-lg border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-200 hover:border-slate-300 flex-col sm:flex-row space-y-2 sm:space-y-0"
+              className="flex  p-4 rounded-lg border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-200 hover:border-slate-300 flex-col space-y-2 sm:space-y-0"
             >
               <div className="flex items-start space-x-3">
                 
@@ -84,10 +89,16 @@ export default function CreationModal({
               <Separator className='my-3'/>
               <Button size={"sm"} 
               onClick={() => {
-                const result = createNewLoop(repo)
-                if (result) {
-                  onOpenChange(false)
-                }
+                const newLoop = createNewLoop(
+                  repo.name,
+                  user.id,
+                  repo.description || "",
+                  user.username || "",
+                  repo.id
+                )
+                addLoop(newLoop)
+
+       
               }}>
                 Select {repo.name}
               </Button>

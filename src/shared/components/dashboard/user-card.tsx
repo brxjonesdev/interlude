@@ -11,6 +11,7 @@ import NotificationsWidget from "@/features/notifications/components/notificatio
 
 export default function UserCard() {
   const { user } = useAuth()
+  console.log("UserCard: user", user)
   const lastUpdate = new Date().toLocaleString()
 
   return (
