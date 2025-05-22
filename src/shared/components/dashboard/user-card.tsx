@@ -8,11 +8,12 @@ import useAuth from "@/shared/hooks/use-auth"
 import CreateLoop from "@/features/loops/components/create-loop"
 import { Skeleton } from "../shadcn/skeleton"
 import NotificationsWidget from "@/features/notifications/components/notification-count"
+import useLoops from "@/features/loops/hooks/useLoops"
 
 export default function UserCard() {
   const { user } = useAuth()
-  console.log("UserCard: user", user)
-  const lastUpdate = new Date().toLocaleString()
+  const { lastUpdate = "5 mins ago" } = useLoops()
+
 
   return (
     <Card className="w-full bg-white rounded-lg px-3 py-2 gap-2">

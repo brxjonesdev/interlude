@@ -1,3 +1,4 @@
+import useLoops from '@/features/loops/hooks/useLoops'
 import useAuth from '@/shared/hooks/use-auth'
 import { useEffect, useState } from 'react'
 export type Repo ={
@@ -14,7 +15,8 @@ export default function useGithub() {
   const { token, user } = useAuth()
 
   const [eligibleRepos, setEligibleRepos] = useState<Repo[]>([])
-  const [status, setStatus] = useState({
+  const { loops} = useLoops()
+   const [status, setStatus] = useState({
     loading: true,
     error: null as string | null,
   })
@@ -41,7 +43,8 @@ export default function useGithub() {
         const repos = await res.json()
         console.log("Fetched repos:", repos)
         // filter out repos data 
-        const filteredRepos = repos.map((repo): Repo => ({
+        const filteredRepos = repos
+        .map((repo): Repo => ({
           id: repo.id,
           name: repo.name,
           fullName: repo.full_name,
@@ -50,6 +53,16 @@ export default function useGithub() {
           url: repo.html_url,
           description: repo.description,
         }))
+        .filter((repo: Repo) => {
+          // Check if the repo is already in the loops
+          const isInLoop = loops.some(loop => loop.repoID === repo.id)
+          const isSelfRepo = repo.owner === repo.name
+          console.log("Repo:", isSelfRepo, repo.owner, user.username)
+          return !isInLoop && !repo.private && !isSelfRepo
+        })
+
+        console.log("Filtered repos:", filteredRepos)
+        // set the eligible repos
 
         setEligibleRepos(filteredRepos)
         setStatus({ loading: false, error: null })
@@ -60,7 +73,7 @@ export default function useGithub() {
     }
 
     fetchEligibleRepos()
-  }, [token, user])
+  }, [token, user, loops])
 
   return {
     eligibleRepos,

@@ -12,7 +12,6 @@ import { Button } from '@/shared/components/shadcn/button';
 import { Separator } from '@/shared/components/shadcn/separator';
 import useLoops from '../hooks/useLoops';
 import useAuth from '@/shared/hooks/use-auth';
-import { createNewLoop } from '../types';
 
 type CreationModalProps = {
   isOpen: boolean;
@@ -24,7 +23,7 @@ export default function CreationModal({
     onOpenChange,
 }: CreationModalProps) {
     const {eligibleRepos, status} = useGithub()
-    const { addLoop } = useLoops()
+    const { createNewLoop } = useLoops()
     const { user } = useAuth()
 
     if (status.loading) {
@@ -88,17 +87,10 @@ export default function CreationModal({
               </div>
               <Separator className='my-3'/>
               <Button size={"sm"} 
+              className='hover:bg-black/80 border border-slate-200 hover:text-cyan-200 font-mono' 
               onClick={() => {
-                const newLoop = createNewLoop(
-                  repo.name,
-                  user.id,
-                  repo.description || "",
-                  user.username || "",
-                  repo.id
-                )
-                addLoop(newLoop)
-
-       
+                createNewLoop(repo)
+                onOpenChange(false)
               }}>
                 Select {repo.name}
               </Button>

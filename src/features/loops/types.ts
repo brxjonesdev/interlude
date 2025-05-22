@@ -1,12 +1,14 @@
+
+
 export type Loop = {
-    id: number
+    id: string
     name: string
     description?: string
     owner: string
-    ownerId: number | string
+    ownerID: number | string
     repoID: number
-    createdAt: string
-    updatedAt: string
+    created_at: string
+    updated_at: string
     updates: Update[]
 }
 
@@ -26,24 +28,4 @@ export type LoopCreation = {
     owner: string
     ownerId: number
     repoID: number
-}
-
-export function createNewLoop(
-    name: string,
-    ownerId: number | string,
-    description: string,
-    owner: string,
-    repoID: number,
-): Loop {
-    return {
-        id: Date.now(),
-        name,
-        description,
-        repoID,
-        owner,
-        ownerId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        updates: []
-    }
 }
